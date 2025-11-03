@@ -75,6 +75,15 @@ typedef unsigned int uint;
 #define RETRO_DEVICETYPE (RETRO_STANDARD)
 #endif
 
+extern bool engineDebugMode;
+
+std::string ComputeFileHash(const std::string &path);
+std::string GetRSDKFilePath();
+
+
+extern std::string fileHash;
+
+
 #elif defined __APPLE__
 #if __IPHONEOS__
 #define RETRO_PLATFORM   (RETRO_iOS)
@@ -261,6 +270,7 @@ enum RetroEngineMessages {
 };
 #endif
 
+
 enum RetroStates {
     ENGINE_DEVMENU     = 0,
     ENGINE_MAINGAME    = 1,
@@ -282,10 +292,18 @@ enum RetroStates {
 #endif
 };
 
+enum ProfileType{ //layouts
+    PROFILE_DEFAULT,
+    PROFILE_AMAZON,
+    PROFILE_CLASSICS,
+};
+extern ProfileType profile;
+
 enum RetroGameType {
     GAME_UNKNOWN = 0,
     GAME_SONIC1  = 1,
     GAME_SONIC2  = 2,
+    GAME_SONICCD  = 3, //fuck you. it should've been S3&K, not you
 };
 
 // General Defines
