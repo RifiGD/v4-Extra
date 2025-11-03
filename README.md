@@ -1,7 +1,7 @@
 # IMPORTANT NOTE
 This fork requires the SHA256 library by System-Glitch. 
-https://github.com/System-Glitch/SHA256/blob/master/src/SHA256.cpp
-
+https://github.com/System-Glitch/SHA256/tree/master
+# 
 ![](header.png?raw=true)
 
 A complete decompilation of Retro Engine v4 and the menus from Sonic 1 and 2 (2013).
