@@ -1,4 +1,5 @@
 #include "RetroEngine.hpp"
+#include "Profiles.hpp"
 
 void SaveSelect_Create(void *objPtr)
 {
@@ -137,6 +138,7 @@ void SaveSelect_Main(void *objPtr)
                 else {
                     if (keyPress.up) {
                         PlaySfxByName("Menu Move", false);
+                        PlaySfxByName("MenuButton", false);
                         self->selectedButton--;
                         if (self->deleteEnabled && self->selectedButton < SAVESELECT_BUTTON_NOSAVE) {
                             self->selectedButton = SAVESELECT_BUTTON_COUNT;
@@ -147,6 +149,7 @@ void SaveSelect_Main(void *objPtr)
                     }
                     else if (keyPress.down) {
                         PlaySfxByName("Menu Move", false);
+                        PlaySfxByName("MenuButton", false);
                         self->selectedButton++;
                         if (self->deleteEnabled && self->selectedButton > SAVESELECT_BUTTON_COUNT) {
                             self->selectedButton = SAVESELECT_BUTTON_NOSAVE;
@@ -184,6 +187,7 @@ void SaveSelect_Main(void *objPtr)
                             if (self->state == SAVESELECT_STATE_MAIN_DELETING) {
                                 if (self->selectedButton > SAVESELECT_BUTTON_NOSAVE && saveGame->files[self->selectedButton - 1].stageID > 0) {
                                     PlaySfxByName("Menu Select", false);
+                                    PlaySfxByName("Select", false);
                                     self->state                                    = SAVESELECT_STATE_DELSETUP;
                                     self->saveButtons[self->selectedButton]->b     = 0xFF;
                                     self->saveButtons[self->selectedButton]->state = SUBMENUBUTTON_STATE_SAVEBUTTON_UNSELECTED;
@@ -191,6 +195,7 @@ void SaveSelect_Main(void *objPtr)
                             }
                             else {
                                 PlaySfxByName("Menu Select", false);
+                                PlaySfxByName("Select", false);
                                 self->saveButtons[self->selectedButton]->state = SUBMENUBUTTON_STATE_FLASHING2;
                                 if (self->selectedButton > SAVESELECT_BUTTON_NOSAVE && saveGame->files[self->selectedButton - 1].stageID > 0) {
                                     StopMusic(true);
@@ -235,6 +240,7 @@ void SaveSelect_Main(void *objPtr)
                         if (self->state == SAVESELECT_STATE_MAIN_DELETING) {
                             if (self->selectedButton > SAVESELECT_BUTTON_NOSAVE && saveGame->files[self->selectedButton - 1].stageID > 0) {
                                 PlaySfxByName("Menu Select", false);
+                                PlaySfxByName("Select", false);
                                 self->state                                    = SAVESELECT_STATE_DELSETUP;
                                 self->saveButtons[self->selectedButton]->b     = 0xFF;
                                 self->saveButtons[self->selectedButton]->state = SUBMENUBUTTON_STATE_SAVEBUTTON_UNSELECTED;
@@ -242,6 +248,7 @@ void SaveSelect_Main(void *objPtr)
                         }
                         else {
                             PlaySfxByName("Menu Select", false);
+                            PlaySfxByName("Select", false);
                             self->saveButtons[self->selectedButton]->state = SUBMENUBUTTON_STATE_FLASHING2;
                             if (self->selectedButton > SAVESELECT_BUTTON_NOSAVE && saveGame->files[self->selectedButton - 1].stageID > 0) {
                                 StopMusic(true);
@@ -442,9 +449,12 @@ void SaveSelect_Main(void *objPtr)
 
             float div                               = (60.0 * Engine.deltaTime) * 16.0;
             NativeEntity_AchievementsButton *button = self->menuControl->buttons[self->menuControl->buttonID];
-            NativeEntity_BackButton *backButton     = self->menuControl->backButton;
-            button->x += ((512.0 - button->x) / div);
+            
+            NativeEntity_BackButton *backButton = self->menuControl->backButton;
             backButton->x += ((1024.0 - backButton->x) / div);
+
+            button->x += ((512.0 - button->x) / div);
+            
             self->delButton->x += ((512.0 - self->delButton->x) / div);
             break;
         }
