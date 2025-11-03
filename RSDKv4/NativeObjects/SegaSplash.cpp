@@ -1,4 +1,5 @@
 #include "RetroEngine.hpp"
+#include "Profiles.hpp"
 
 void SegaSplash_Create(void *objPtr)
 {
@@ -97,8 +98,22 @@ void SegaSplash_Create(void *objPtr)
 }
 void SegaSplash_Main(void *objPtr)
 {
+
     RSDK_THIS(SegaSplash);
 
+    ProfileType profile;
+    profile = PROFILE_DEFAULT;
+
+    for (auto &h : SpecialProfiles::AmazonHashes)
+        if (fileHash == h) profile = PROFILE_AMAZON;
+
+    for (auto &h : SpecialProfiles::ClassicsHashes)
+        if (fileHash == h) profile = PROFILE_CLASSICS;
+        
+    if (profile == PROFILE_CLASSICS){
+        ResetNativeObject(self, CWSplash_Create, CWSplash_Main);
+
+    }
     switch (self->state) {
         case SEGAPLASH_STATE_ENTER:
             self->rectAlpha -= 300.0 * Engine.deltaTime;
