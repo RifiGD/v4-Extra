@@ -1,4 +1,11 @@
 #include "RetroEngine.hpp"
+#include "Profiles.hpp"
+#include "SHA256.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <cmath>
+
 
 #if !RETRO_USE_ORIGINAL_CODE
 bool usingCWD        = false;
@@ -9,7 +16,58 @@ bool engineDebugMode = false;
 #include <unistd.h>
 #endif
 
+
+
 RetroEngine Engine = RetroEngine();
+
+std::string fileHash;
+
+
+
+std::string GetRSDKFilePath() {
+    std::ifstream ini("settings.ini");
+    if (!ini.is_open())
+        return "Data.rsdk";
+
+    std::string line;
+    while (std::getline(ini, line)) {
+        if (line.find("DataFile=") == 0)
+            return line.substr(9); // after "DataFile="
+    }
+    return "Data.rsdk";
+}
+
+std::string ComputeFileHash(const std::string &path) {
+    std::ifstream file(path, std::ios::binary);
+    if (!file.is_open()) return "";
+
+    SHA256 sha;
+    char buffer[4096];
+    while (file.read(buffer, sizeof(buffer))) {
+        sha.update(reinterpret_cast<uint8_t*>(buffer), file.gcount());
+    }
+    if (file.gcount() > 0)
+        sha.update(reinterpret_cast<uint8_t*>(buffer), file.gcount());
+
+    return SHA256::toString(sha.digest());
+}
+
+std::string rsdkPath = GetRSDKFilePath();
+
+
+ProfileType profile;
+
+void SetProfiles(){
+    ProfileType profile;
+    profile = PROFILE_DEFAULT;
+
+    for (auto &h : SpecialProfiles::AmazonHashes)
+        if (fileHash == h) profile = PROFILE_AMAZON;
+
+    for (auto &h : SpecialProfiles::ClassicsHashes)
+        if (fileHash == h) profile = PROFILE_CLASSICS;
+}
+
 
 #if !RETRO_USE_ORIGINAL_CODE
 inline int GetLowerRate(int intendRate, int targetRate)
@@ -276,6 +334,8 @@ bool ProcessEvents()
 
 void RetroEngine::Init()
 {
+    std::string rsdkPath = GetRSDKFilePath();
+    fileHash = ComputeFileHash(rsdkPath);
     CalculateTrigAngles();
     GenerateBlendLookupTable();
 
@@ -426,7 +486,12 @@ void RetroEngine::Init()
 #endif
         gameType = GAME_SONIC1;
     }
+    else if (strstr(gameWindowText, "Sonic CD")){
+        gameType = GAME_SONICCD;
+    }
+    
 #endif
+
 
 #if !RETRO_USE_ORIGINAL_CODE
     bool skipStore = skipStartMenu;
@@ -474,6 +539,21 @@ void RetroEngine::Init()
         AddAchievement("Scrambled Egg", "Defeat Dr. Eggman's Boss\rAttack mode in under 7\rminutes");
         AddAchievement("Beat the Clock", "Complete the Time Attack\rmode in less than 45\rminutes");
     }
+    else if (Engine.gameType == GAME_SONICCD) {
+    AddAchievement("88 Miles Per Hour",      "Travel through time.");  
+    AddAchievement("Just one hug is enough", "Get a hug from Amy.");  
+    AddAchievement("Paradise Found",         "Complete a Zone in the Good Future.");  
+    AddAchievement("Take the High Road",     "Pass the upper Signpost in Collision Chaos Zone 2.");  
+    AddAchievement("King of the Rings",      "Collect 200 Rings.");  
+    AddAchievement("Statue Saviour",         "Find the angel statue in Wacky Workbench.");  
+    AddAchievement("Heavy Metal",            "Defeat Metal Sonic without getting hurt.");  
+    AddAchievement("All Stages Clear!",      "Finish the game.");  
+    AddAchievement("Treasure Hunter",        "Collect all the Time Stones.");  
+    AddAchievement("Dr. Eggman Got Served",  "Destroy Dr. Eggman's final machine.");  
+    AddAchievement("Just in Time!",          "Complete the Time Attack mode in under 25 minutes.");  
+    AddAchievement("Saviour of the Planet",  "Destroy all the robot teleporters and Metal Sonic holograms in the past.");  
+}
+
 
     if (skipStart)
         Engine.gameMode = ENGINE_MAINGAME;
@@ -525,6 +605,10 @@ void RetroEngine::Init()
 void RetroEngine::Run()
 {
     Engine.deltaTime = 0.0f;
+    
+    if (profile == PROFILE_CLASSICS){
+        usePhysicalControls = true;
+    }
 
     unsigned long long targetFreq = SDL_GetPerformanceFrequency() / Engine.refreshRate;
     unsigned long long curTicks   = 0;
@@ -1332,3 +1416,5 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
 
     return loaded;
 }
+
+
