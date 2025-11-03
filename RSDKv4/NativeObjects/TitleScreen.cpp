@@ -1,8 +1,14 @@
 #include "RetroEngine.hpp"
+#include "Profiles.hpp"
 
 void TitleScreen_Create(void *objPtr)
 {
     RSDK_THIS(TitleScreen);
+    for (auto &h : SpecialProfiles::AmazonHashes)
+        if (fileHash == h) profile = PROFILE_AMAZON;
+
+    for (auto &h : SpecialProfiles::ClassicsHashes)
+        if (fileHash == h) profile = PROFILE_CLASSICS;
     int heading  = 0;
     int labelTex = 0;
     int textTex  = 0;
@@ -163,6 +169,9 @@ void TitleScreen_Main(void *objPtr)
 {
     RSDK_THIS(TitleScreen);
 
+    if (profile == PROFILE_CLASSICS){
+        ResetNativeObject(self, MenuControl_Create, MenuControl_Main);
+    }
     switch (self->state) {
         case TITLESCREEN_STATE_SETUP: {
             PlayMusic(0, 0);
