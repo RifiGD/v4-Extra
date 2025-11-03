@@ -1,4 +1,5 @@
 #include "RetroEngine.hpp"
+#include "Profiles.hpp"
 
 float timeAttackU[] = { 1.0, 321.0, 641.0, 1.0, 321.0, 641.0, 641.0 };
 float timeAttackV[] = { 1.0, 1.0, 1.0, 241.0, 241.0, 241.0, 721.0 };
@@ -6,6 +7,11 @@ float timeAttackV[] = { 1.0, 1.0, 1.0, 241.0, 241.0, 241.0, 721.0 };
 void RecordsScreen_Create(void *objPtr)
 {
     RSDK_THIS(RecordsScreen);
+    for (auto &h : SpecialProfiles::AmazonHashes)
+        if (fileHash == h) profile = PROFILE_AMAZON;
+
+    for (auto &h : SpecialProfiles::ClassicsHashes)
+        if (fileHash == h) profile = PROFILE_CLASSICS;
     self->labelPtr                  = CREATE_ENTITY(TextLabel);
     self->labelPtr->fontID          = FONT_HEADING;
     self->labelPtr->scale           = 0.15;
@@ -18,8 +24,8 @@ void RecordsScreen_Create(void *objPtr)
 
     self->meshPanel = LoadMesh("Data/Game/Models/Panel.bin", -1);
     SetMeshVertexColors(self->meshPanel, 0, 0, 0, 0xC0);
-
     self->textureArrows = LoadTexture("Data/Game/Menu/ArrowButtons.png", TEXFMT_RGBA5551);
+
     SetStringToFont(self->textRecords, strRecords, FONT_LABEL);
 
     self->recordTextWidth = GetTextWidth(self->textRecords, FONT_LABEL, 0.125) * 0.5;
@@ -744,7 +750,9 @@ void RecordsScreen_Main(void *objPtr)
     }
 
     if (self->backPressed)
-        RenderImage(128.0, -92.0, 160.0, 0.3, 0.3, 64.0, 64.0, 128.0, 128.0, 128.0, 128.0, self->buttonAlpha, self->textureArrows);
+        if(profile!=PROFILE_CLASSICS){
+        RenderImage(128.0, -92.0, 160.0, 0.3, 0.3, 64.0, 64.0, 128.0, 128.0, 128.0, 128.0, self->buttonAlpha, self->textureArrows);}
     else
-        RenderImage(128.0, -92.0, 160.0, 0.3, 0.3, 64.0, 64.0, 128.0, 128.0, 128.0, 0.0, self->buttonAlpha, self->textureArrows);
+        if(profile!=PROFILE_CLASSICS){
+        RenderImage(128.0, -92.0, 160.0, 0.3, 0.3, 64.0, 64.0, 128.0, 128.0, 128.0, 0.0, self->buttonAlpha, self->textureArrows);}
 }
