@@ -1,46 +1,85 @@
-#include "RetroEngine.hpp"
+#include "RetroEngine.hpp" // now fileHash is visible
+#include "Profiles.hpp"
+#include "SHA256.h"
+#include <string>
+#include <fstream>
+#include <sstream>
+#include <cmath>
 
 bool usePhysicalControls = false;
 
-void MenuControl_Create(void *objPtr)
-{
+
+void MenuControl_Create(void *objPtr) {
     RSDK_THIS(MenuControl);
+    // Determine profile based on RSDK data hash
+    for (auto &h : SpecialProfiles::AmazonHashes)
+        if (fileHash == h) profile = PROFILE_AMAZON;
+
+    for (auto &h : SpecialProfiles::ClassicsHashes)
+        if (fileHash == h) profile = PROFILE_CLASSICS;
+    // Common initialization
     SetMusicTrack("MainMenu.ogg", 0, true, 106596);
     CREATE_ENTITY(MenuBG);
 
-    self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(StartGameButton);
-    self->buttonFlags[self->buttonCount] = BUTTON_STARTGAME;
-    self->buttonCount++;
+    // --- Buttons based on profile ---
+    if (profile == PROFILE_AMAZON) {
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(StartGameButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_STARTGAME;
+        self->buttonCount++;
 
-    self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(TimeAttackButton);
-    self->buttonFlags[self->buttonCount] = BUTTON_TIMEATTACK;
-    self->buttonCount++;
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(TimeAttackButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_TIMEATTACK;
+        self->buttonCount++;
+
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(OptionsButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_OPTIONS;
+        self->buttonCount++;
+    }
+    else if (profile == PROFILE_CLASSICS) {
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(StartGameButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_STARTGAME;
+        self->buttonCount++;
+
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(TimeAttackButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_TIMEATTACK;
+        self->buttonCount++;
+    }
+    else { // Default: everything
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(StartGameButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_STARTGAME;
+        self->buttonCount++;
+
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(TimeAttackButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_TIMEATTACK;
+        self->buttonCount++;
 
 #if RETRO_USE_MOD_LOADER
-    int vsID = GetSceneID(STAGELIST_PRESENTATION, "2P VS");
-    if (vsID != -1) {
+        int vsID = GetSceneID(STAGELIST_PRESENTATION, "2P VS");
+        if (vsID != -1) {
 #else
-    if (Engine.gameType == GAME_SONIC2) {
+        if (Engine.gameType == GAME_SONIC2) {
 #endif
-        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(MultiplayerButton);
-        self->buttonFlags[self->buttonCount] = BUTTON_MULTIPLAYER;
+            self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(MultiplayerButton);
+            self->buttonFlags[self->buttonCount] = BUTTON_MULTIPLAYER;
+            self->buttonCount++;
+        }
+
+        if (Engine.onlineActive) {
+            self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(AchievementsButton);
+            self->buttonFlags[self->buttonCount] = BUTTON_ACHIEVEMENTS;
+            self->buttonCount++;
+
+            self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(LeaderboardsButton);
+            self->buttonFlags[self->buttonCount] = BUTTON_LEADERBOARDS;
+            self->buttonCount++;
+        }
+
+        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(OptionsButton);
+        self->buttonFlags[self->buttonCount] = BUTTON_OPTIONS;
         self->buttonCount++;
     }
 
-    if (Engine.onlineActive) {
-        self->buttons[self->buttonCount]     = CREATE_ENTITY(AchievementsButton);
-        self->buttonFlags[self->buttonCount] = BUTTON_ACHIEVEMENTS;
-        self->buttonCount++;
-
-        self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(LeaderboardsButton);
-        self->buttonFlags[self->buttonCount] = BUTTON_LEADERBOARDS;
-        self->buttonCount++;
-    }
-
-    self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(OptionsButton);
-    self->buttonFlags[self->buttonCount] = BUTTON_OPTIONS;
-    self->buttonCount++;
-
+    // --- Back & SegaID Buttons ---
     self->backButton          = CREATE_ENTITY(BackButton);
     self->backButton->visible = false;
     self->backButton->x       = 240.0;
@@ -52,11 +91,12 @@ void MenuControl_Create(void *objPtr)
     self->segaIDButton->texX = 0.0;
     self->segaIDButton->x    = SCREEN_CENTERX_F - 32.0;
 
-    self->buttonIncline = 0.15707964f;  // this but less precise ---> M_PI / 2
-    self->buttonSpacing = 0.078539819f; // this but less precise ---> M_PI / 4
+    // --- Layout ---
+    self->buttonIncline = 0.15707964f;
+    self->buttonSpacing = 0.078539819f;
     self->menuEndPos    = (self->buttonCount * self->buttonIncline) * 0.5;
 
-    float offset = 0.0;
+    float offset = 0.0f;
     for (int b = 0; b < self->buttonCount; ++b) {
         NativeEntity_AchievementsButton *button = self->buttons[b];
         float sin                               = sinf(self->buttonMovePos + offset);
@@ -71,19 +111,21 @@ void MenuControl_Create(void *objPtr)
     PlayMusic(0, 0);
     if (Engine.gameDeviceType == RETRO_STANDARD)
         usePhysicalControls = true;
+
     BackupNativeObjects();
 }
+
+// --- MenuControl main loop ---
 void MenuControl_Main(void *objPtr)
 {
     RSDK_THIS(MenuControl);
     NativeEntity_SegaIDButton *segaIDButton = self->segaIDButton;
     NativeEntity_BackButton *backButton     = self->backButton;
-
+    int TAttack_ID;
     switch (self->state) {
         case MENUCONTROL_STATE_MAIN: {
             CheckKeyDown(&keyDown);
             CheckKeyPress(&keyPress);
-
             if (segaIDButton->alpha < 0x100 && Engine.language != RETRO_JP && !(Engine.language == RETRO_ZH || Engine.language == RETRO_ZS)
                 && Engine.gameDeviceType == RETRO_MOBILE)
                 segaIDButton->alpha += 8;
@@ -123,6 +165,7 @@ void MenuControl_Main(void *objPtr)
                         else if (segaIDButton->state == SEGAIDBUTTON_STATE_PRESSED) {
                             segaIDButton->state = SEGAIDBUTTON_STATE_IDLE;
                             PlaySfxByName("Menu Select", false);
+                            PlaySfxByName("Select", false);
                             ShowPromoPopup(0, "MoreGames");
                         }
                         else if (keyDown.left || keyDown.right) {
@@ -226,6 +269,7 @@ void MenuControl_Main(void *objPtr)
                                 self->timer                                    = 0.0;
                                 self->state                                    = MENUCONTROL_STATE_ACTION;
                                 PlaySfxByName("Menu Select", false);
+                                PlaySfxByName("Select", false);
                             }
                             self->buttons[self->buttonID]->g = 0xFF;
                             self->stateInput                 = MENUCONTROL_STATEINPUT_CHECKTOUCH;
@@ -252,6 +296,7 @@ void MenuControl_Main(void *objPtr)
                             self->stateInput = MENUCONTROL_STATEINPUT_HANDLEDRAG;
                             self->targetButtonMovePos -= self->buttonSpacing;
                             PlaySfxByName("Menu Move", false);
+                            PlaySfxByName("MenuButton", false);
                             self->buttonMoveVelocity = -0.01;
                             self->buttonID++;
                             if (self->buttonID >= self->buttonCount)
@@ -261,6 +306,7 @@ void MenuControl_Main(void *objPtr)
                             self->stateInput = MENUCONTROL_STATEINPUT_HANDLEDRAG;
                             self->targetButtonMovePos += self->buttonSpacing;
                             PlaySfxByName("Menu Move", false);
+                            PlaySfxByName("MenuButton", false);
                             self->buttonMoveVelocity = 0.01;
                             self->buttonID--;
                             if (self->buttonID > self->buttonCount)
@@ -272,6 +318,7 @@ void MenuControl_Main(void *objPtr)
                             self->timer                                    = 0.0;
                             self->state                                    = MENUCONTROL_STATE_ACTION;
                             PlaySfxByName("Menu Select", false);
+                            PlaySfxByName("Select", false);
                         }
 
                         for (int i = 0; i < self->buttonCount; ++i) {
@@ -323,18 +370,34 @@ void MenuControl_Main(void *objPtr)
                         self->autoButtonMoveVelocity                   = 0.0;
                         button->g                                      = 0xFF;
                         self->buttons[self->buttonID]->labelPtr->state = TEXTLABEL_STATE_NONE;
-                        self->backButton->visible                      = true;
+                        if (profile != PROFILE_CLASSICS){
+                            self->backButton->visible = true;
+                        }
                         SetGlobalVariableByName("options.vsMode", false);
                         CREATE_ENTITY(SaveSelect);
                         break;
 
                     case BUTTON_TIMEATTACK:
-                        self->state                  = MENUCONTROL_STATE_ENTERSUBMENU;
-                        self->autoButtonMoveVelocity = 0.0;
-                        button->g                    = 0xFF;
-                        button->labelPtr->state      = TEXTLABEL_STATE_NONE;
-                        self->backButton->visible    = true;
-                        CREATE_ENTITY(TimeAttack);
+                        if (Engine.gameType != GAME_SONICCD){
+                            self->state                  = MENUCONTROL_STATE_ENTERSUBMENU;
+                            self->autoButtonMoveVelocity = 0.0;
+                            button->g                    = 0xFF;
+                            button->labelPtr->state      = TEXTLABEL_STATE_NONE;
+                            if (profile != PROFILE_CLASSICS){
+                                self->backButton->visible = true;
+                            }
+                            CREATE_ENTITY(TimeAttack);
+                        }
+                        else {
+                            int id = GetSceneID(STAGELIST_PRESENTATION, "TIME ATTACK");
+                            if (id==-1){
+
+                                id = 3;
+                            }
+                            InitStartingStage(STAGELIST_PRESENTATION, id, 0);
+                            CREATE_ENTITY(FadeScreen);
+                        }
+                        
                         break;
 
                     case BUTTON_MULTIPLAYER:
