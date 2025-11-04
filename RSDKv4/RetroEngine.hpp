@@ -15,7 +15,12 @@
 #endif
 
 #ifndef RETRO_USE_NETWORKING
-#define RETRO_USE_NETWORKING (!RETRO_USE_ORIGINAL_CODE && 1)
+#define RETRO_USE_NETWORKING (!RETRO_USE_ORIGINAL_CODE && 0)
+#endif
+
+//fix for fucking Makefile.msys2 when not using mod loader
+#if !RETRO_USE_MOD_LOADER
+#include <string>
 #endif
 
 // Forces all DLC flags to be disabled, this should be enabled in any public releases
