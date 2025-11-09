@@ -1009,6 +1009,13 @@ void ShowLeaderboardsScreen()
     PrintLog("we're showing the leaderboards screen");
 }
 
+void PlayVideo(char *videoName, int *unused) 
+{
+    //TODO: get a video player working, hopefully one day
+    PrintLog("PlayVideo triggered");
+    
+}
+
 bool disableFocusPause_Store = false;
 void Connect2PVS(int *gameLength, int *itemMode)
 {

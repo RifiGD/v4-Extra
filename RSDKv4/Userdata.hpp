@@ -192,6 +192,10 @@ inline void LoadLeaderboardsMenu()
 }
 void ShowLeaderboardsScreen();
 
+// this is the new native function used in CD18
+void PlayVideo(char *videoName, int *unused);
+// afaik, first non-decomp NF that has an unused parameter
+
 void Connect2PVS(int *gameLength, int *itemMode);
 void Disconnect2PVS();
 void SendEntity(int *entityID, int *verify);
