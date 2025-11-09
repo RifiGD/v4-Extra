@@ -1343,6 +1343,11 @@ bool RetroEngine::LoadGameConfig(const char *filePath)
 #if RETRO_USE_HAPTICS
     AddNativeFunction("HapticEffect", HapticEffect);
 #endif
+
+    //Sonic CD 2018 port
+    AddNativeFunction("PlayVideo", PlayVideo);
+    //v4 video player is real
+
     AddNativeFunction("Connect2PVS", Connect2PVS);
     AddNativeFunction("Disconnect2PVS", Disconnect2PVS);
     AddNativeFunction("SendEntity", SendEntity);
