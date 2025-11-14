@@ -1009,7 +1009,7 @@ void ShowLeaderboardsScreen()
     PrintLog("we're showing the leaderboards screen");
 }
 
-void PlayVideo(char *videoName, int *unused) 
+void PlayVideo(int *unused, char *videoName) 
 {
     //TODO: get a video player working, hopefully one day
     PrintLog("PlayVideo Triggered");
