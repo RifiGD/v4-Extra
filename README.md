@@ -58,7 +58,7 @@ This project uses [CMake](https://cmake.org/), a versatile building system that 
 Instead, you will need to clone the repository using Git, which you can get [here](https://git-scm.com/downloads).
 
 Clone the repo **recursively**, using:
-`git clone --recursive https://github.com/RSDKModding/RSDKv4-Decompilation`
+`git clone --recursive https://github.com/RifiGD/v4-Extra`
 
 If you've already cloned the repo, run this command inside of the repository:
 ```git submodule update --init --recursive```
