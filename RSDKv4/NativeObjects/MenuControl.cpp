@@ -11,7 +11,9 @@ bool usePhysicalControls = false;
 
 void MenuControl_Create(void *objPtr) {
     RSDK_THIS(MenuControl);
-    // Determine profile based on RSDK data hash
+    profile = PROFILE_DEFAULT;
+    // Determine menu layout based on profile
+    SetProfiles();
     for (auto &h : SpecialProfiles::AmazonHashes)
         if (fileHash == h) profile = PROFILE_AMAZON;
 
@@ -21,7 +23,7 @@ void MenuControl_Create(void *objPtr) {
     SetMusicTrack("MainMenu.ogg", 0, true, 106596);
     CREATE_ENTITY(MenuBG);
 
-    // --- Buttons based on profile ---
+    // Menu layouts based on the different engine versions, replicated with profiles
     if (profile == PROFILE_AMAZON) {
         self->buttons[self->buttonCount]     = (NativeEntity_AchievementsButton *)CREATE_ENTITY(StartGameButton);
         self->buttonFlags[self->buttonCount] = BUTTON_STARTGAME;
@@ -371,8 +373,8 @@ void MenuControl_Main(void *objPtr)
                         button->g                                      = 0xFF;
                         self->buttons[self->buttonID]->labelPtr->state = TEXTLABEL_STATE_NONE;
                         if (profile != PROFILE_CLASSICS){
-                            self->backButton->visible = true;
-                        }
+                            self->backButton->visible = true; //Sega Classics doesnt show this button
+                        } //despite it still being clickable
                         SetGlobalVariableByName("options.vsMode", false);
                         CREATE_ENTITY(SaveSelect);
                         break;
@@ -384,16 +386,19 @@ void MenuControl_Main(void *objPtr)
                             button->g                    = 0xFF;
                             button->labelPtr->state      = TEXTLABEL_STATE_NONE;
                             if (profile != PROFILE_CLASSICS){
-                                self->backButton->visible = true;
+                                self->backButton->visible = true; //same here
                             }
                             CREATE_ENTITY(TimeAttack);
                         }
-                        else {
+                        else { //CD behavior, Time Attack is a scene instead of a Native Object
                             int id = GetSceneID(STAGELIST_PRESENTATION, "TIME ATTACK");
                             if (id==-1){
-
+                                //fallback...?
                                 id = 3;
                             }
+                            ReadSaveRAMData(); //always starts with everything unlocked
+                            //trying to actually make it check the save data to see if it locks/unlocks accordingly to the save file
+                            //if it doesnt work, whatever i guess
                             InitStartingStage(STAGELIST_PRESENTATION, id, 0);
                             CREATE_ENTITY(FadeScreen);
                         }

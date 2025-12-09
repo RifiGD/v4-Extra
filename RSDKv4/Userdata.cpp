@@ -1012,7 +1012,7 @@ void ShowLeaderboardsScreen()
 void PlayVideo(int *unused, char *videoName) 
 {
     //TODO: get a video player working, hopefully one day
-    PrintLog("PlayVideo Triggered");
+    PrintLog("Loaded video: \"%s\"", videoName);
 }
 
 bool disableFocusPause_Store = false;

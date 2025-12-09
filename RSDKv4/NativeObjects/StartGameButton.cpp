@@ -6,7 +6,7 @@ void StartGameButton_Create(void *objPtr)
     self->textureCircle = LoadTexture("Data/Game/Menu/Circle.png", TEXFMT_RGBA4444);
 
     int package = 0;
-    if (Engine.gameType != GAME_SONICCD){
+    if (Engine.gameType != GAME_SONICCD){ //Cartridge models for Sonic 1 & 2
     switch (Engine.globalBoxRegion) {
         case REGION_JP:
             package        = LoadTexture("Data/Game/Models/Package_JP.png", TEXFMT_RGBA5551);
@@ -24,7 +24,7 @@ void StartGameButton_Create(void *objPtr)
             break;
     }
     }
-    else{
+    else{ //Compact Disc model for Sonic CD
         switch (Engine.globalBoxRegion) {
         case REGION_JP:
             package        = LoadTexture("Data/Game/Models/DiscJP.png", TEXFMT_RGBA5551);

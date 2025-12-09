@@ -25,7 +25,7 @@
 
 // Forces all DLC flags to be disabled, this should be enabled in any public releases
 #ifndef RSDK_AUTOBUILD
-#define RSDK_AUTOBUILD (0)
+#define RSDK_AUTOBUILD (1)
 #endif
 
 // ================
@@ -550,3 +550,5 @@ public:
 
 extern RetroEngine Engine;
 #endif // !RETROENGINE_H
+
+void SetProfiles();

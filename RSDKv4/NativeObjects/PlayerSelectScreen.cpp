@@ -4,6 +4,8 @@
 void PlayerSelectScreen_Create(void *objPtr)
 {
     RSDK_THIS(PlayerSelectScreen);
+    profile = PROFILE_DEFAULT;
+    SetProfiles();
     for (auto &h : SpecialProfiles::AmazonHashes)
         if (fileHash == h) profile = PROFILE_AMAZON;
 

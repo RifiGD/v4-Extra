@@ -4,11 +4,14 @@
 void TitleScreen_Create(void *objPtr)
 {
     RSDK_THIS(TitleScreen);
+    profile = PROFILE_DEFAULT;
+    SetProfiles();
     for (auto &h : SpecialProfiles::AmazonHashes)
         if (fileHash == h) profile = PROFILE_AMAZON;
 
     for (auto &h : SpecialProfiles::ClassicsHashes)
         if (fileHash == h) profile = PROFILE_CLASSICS;
+        //forcing anyways pls god no more issues
     int heading  = 0;
     int labelTex = 0;
     int textTex  = 0;
@@ -168,10 +171,13 @@ void TitleScreen_Create(void *objPtr)
 void TitleScreen_Main(void *objPtr)
 {
     RSDK_THIS(TitleScreen);
-
-    if (profile == PROFILE_CLASSICS){
+    //Sega Classics menu skips directly to MenuControl, replicating that behavior here
+    if (profile == PROFILE_CLASSICS || Engine.gameType == GAME_SONICCD){
         ResetNativeObject(self, MenuControl_Create, MenuControl_Main);
     }
+    //also i kinda never load CD's models for the TitleScreen so I'll skip it here too
+
+    //rest of logic if profile isn't CLASSICS or game isn't CD
     switch (self->state) {
         case TITLESCREEN_STATE_SETUP: {
             PlayMusic(0, 0);

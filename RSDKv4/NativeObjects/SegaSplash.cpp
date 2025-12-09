@@ -104,12 +104,13 @@ void SegaSplash_Main(void *objPtr)
     ProfileType profile;
     profile = PROFILE_DEFAULT;
 
+    SetProfiles();
     for (auto &h : SpecialProfiles::AmazonHashes)
         if (fileHash == h) profile = PROFILE_AMAZON;
 
     for (auto &h : SpecialProfiles::ClassicsHashes)
         if (fileHash == h) profile = PROFILE_CLASSICS;
-        
+    //Sega Classics menu skips directly to CWSplash, replicating that behavior here    
     if (profile == PROFILE_CLASSICS){
         ResetNativeObject(self, CWSplash_Create, CWSplash_Main);
 

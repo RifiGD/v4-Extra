@@ -219,12 +219,14 @@ void PauseMenu_Main(void *objPtr)
                 else {
                     if (keyPress.up) {
                         PlaySfxByName("Menu Move", false);
+                        PlaySfxByName("MenuButton", false);
                         self->buttonSelected--;
                         if (self->buttonSelected < PMB_CONTINUE)
                             self->buttonSelected = pauseMenuButtonCount - 1;
                     }
                     else if (keyPress.down) {
                         PlaySfxByName("Menu Move", false);
+                        PlaySfxByName("MenuButton", false);
                         self->buttonSelected++;
                         if (self->buttonSelected >= pauseMenuButtonCount)
                             self->buttonSelected = PMB_CONTINUE;
@@ -233,6 +235,7 @@ void PauseMenu_Main(void *objPtr)
                     self->buttons[self->buttonSelected]->b = 0;
                     if (self->buttons[self->buttonSelected]->g > 0x80 && (keyPress.start || keyPress.A)) {
                         PlaySfxByName("Menu Select", false);
+                        PlaySfxByName("Select", false);
                         self->buttons[self->buttonSelected]->state = SUBMENUBUTTON_STATE_FLASHING2;
                         self->buttons[self->buttonSelected]->b     = 0xFF;
                         self->state                                = PAUSEMENU_STATE_ACTION;
@@ -250,6 +253,7 @@ void PauseMenu_Main(void *objPtr)
                     else if (!self->buttons[i]->b) {
                         self->buttonSelected = i;
                         PlaySfxByName("Menu Select", false);
+                        PlaySfxByName("Select", false);
                         self->buttons[i]->state = SUBMENUBUTTON_STATE_FLASHING2;
                         self->buttons[i]->b     = 0xFF;
                         self->state             = PAUSEMENU_STATE_ACTION;
@@ -273,6 +277,7 @@ void PauseMenu_Main(void *objPtr)
                 self->miniPauseDisabled = false;
                 if (self->makeSound) {
                     PlaySfxByName("Menu Select", false);
+                    PlaySfxByName("Select", false);
                     self->makeSound = false;
                 }
             }
