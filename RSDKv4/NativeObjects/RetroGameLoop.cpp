@@ -42,7 +42,7 @@ void RetroGameLoop_Main(void *objPtr)
 
         case ENGINE_INITDEVMENU:
             Engine.LoadGameConfig("Data/Game/GameConfig.bin");
-            InitDevMenu();
+            InitStageSelectMenu();
             ResetCurrentStageFolder();
             break;
 
@@ -126,7 +126,7 @@ void RetroGameLoop_Main(void *objPtr)
 #if RETRO_USE_MOD_LOADER
         case ENGINE_INITMODMENU:
             Engine.LoadGameConfig("Data/Game/GameConfig.bin");
-            InitDevMenu();
+            InitStageSelectMenu();
 
             ResetCurrentStageFolder();
 

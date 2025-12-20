@@ -98,7 +98,7 @@ enum DevMenuMenus {
 #endif
 };
 
-void InitDevMenu();
+void InitStageSelectMenu();
 void InitErrorMessage();
 void ProcessStageSelect();
 

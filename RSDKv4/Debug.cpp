@@ -5,7 +5,7 @@ int touchFlags = 0;
 
 int taListStore = 0;
 
-void InitDevMenu()
+void InitStageSelectMenu()
 {
 #if RETRO_USE_MOD_LOADER
     for (int m = 0; m < modList.size(); ++m) ScanModFolder(&modList[m]);
